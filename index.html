@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>武汉二十中小智</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;background:linear-gradient(180deg,#0A1E36,#0F2740);color:#E0EAF4;min-height:100vh;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+.top{background:linear-gradient(180deg,#0E2440,#0A1E36);padding:20px 16px 16px;border-bottom:3px solid #C8942A;position:sticky;top:0;z-index:100}
+.bot-name{font-size:32px;font-weight:900;color:#FFF;text-align:center;letter-spacing:6px;margin-bottom:4px;text-shadow:0 2px 16px rgba(200,148,42,.35)}
+.motto{font-size:24px;font-weight:800;color:#FFF;text-align:center;letter-spacing:8px;margin-bottom:14px;text-shadow:0 0 10px rgba(255,255,255,.15)}
+.honors{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:8px}
+.honor{color:#C8942A;font-size:16px;font-weight:700;letter-spacing:1px}
+.honor::before{content:'★ ';font-size:14px}
+.contact{display:flex;justify-content:center;gap:16px;font-size:12px;color:#6A8EAA;margin-top:6px}
+.contact b{color:#C8942A}
+.chat-wrap{flex:1;overflow-y:auto;padding:12px 12px 0;max-width:720px;width:100%;margin:0 auto}
+.msg{display:flex;gap:8px;margin-bottom:12px;animation:fadeUp .25s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.msg.bot .av{background:linear-gradient(135deg,#C8942A,#9A6E10)}
+.msg.user .av{background:linear-gradient(135deg,#3A80C8,#1F5A90)}
+.bbl{max-width:82%;padding:10px 14px;border-radius:14px;font-size:15px;line-height:1.75;word-break:break-word}
+.msg.bot .bbl{background:rgba(255,255,255,.09);border-bottom-left-radius:4px}
+.msg.user .bbl{background:linear-gradient(135deg,#3A80C8,#1F5A90);border-bottom-right-radius:4px}
+.bbl .t{font-size:10px;color:rgba(255,255,255,.35);margin-top:4px;display:block}
+.bbl .src{font-size:10px;color:#5A7A94;margin-top:6px;padding-top:4px;border-top:1px dashed rgba(255,255,255,.08)}
+.bbl .learn{font-size:10px;color:#5AAA5A;margin-top:4px;font-style:italic}
+.input-bar{padding:10px 12px 14px;background:rgba(0,0,0,.15);border-top:1px solid rgba(255,255,255,.06);max-width:720px;width:100%;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
+.input-bar textarea{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:10px 16px;color:#fff;font-size:15px;font-family:inherit;resize:none;outline:none;min-height:42px;max-height:100px;line-height:1.5;transition:border-color .2s}
+.input-bar textarea:focus{border-color:#C8942A}
+.input-bar textarea::placeholder{color:#4A6A80}
+.send{background:#C8942A;border:none;border-radius:22px;color:#0A1E36;font-size:15px;font-weight:700;padding:10px 18px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .2s}
+.send:hover{background:#DAA832}
+.send:disabled{background:#3A4A5A;cursor:not-allowed}
+.typing{display:flex;gap:5px;padding:10px 14px}
+.tdot{width:6px;height:6px;background:#C8942A;border-radius:50%;animation:bounce 1s infinite}
+.tdot:nth-child(2){animation-delay:.2s}
+.tdot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.kb-panel{position:fixed;right:-320px;top:0;width:310px;height:100%;background:rgba(10,30,54,.97);border-left:1px solid rgba(200,148,42,.3);z-index:200;transition:right .3s;overflow-y:auto;padding:20px 16px}
+.kb-panel.open{right:0}
+.kb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;display:none}
+.kb-overlay.show{display:block}
+.kb-close{position:absolute;top:12px;right:12px;background:none;border:none;color:#C8942A;font-size:20px;cursor:pointer}
+.kb-title{font-size:16px;color:#C8942A;font-weight:700;margin-bottom:12px}
+.kb-info{font-size:13px;color:#7A9ABB;line-height:1.8}
+.kb-info b{color:#C8942A}
+.kb-list{margin-top:12px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px}
+.kb-item{font-size:12px;color:#5A7A94;padding:3px 0}
+.kb-item .dot{color:#C8942A;margin-right:4px}
+.bottom-bar{position:fixed;bottom:70px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:50}
+.float-btn{background:rgba(200,148,42,.2);border:1px solid rgba(200,148,42,.4);color:#C8942A;font-size:11px;padding:6px 12px;border-radius:20px;cursor:pointer;font-family:inherit;transition:all .2s}
+.float-btn:hover{background:rgba(200,148,42,.4)}
+@media(max-width:600px){
+.top{padding:14px 10px 10px}.bot-name{font-size:26px;letter-spacing:4px}
+.motto{font-size:20px;letter-spacing:5px}.honor{font-size:14px}
+.bbl{max-width:88%;font-size:14px}.contact{flex-direction:column;gap:2px;text-align:center}
+.kb-panel{width:280px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="bot-name">武汉二十中小智</div>
+  <div class="motto">进德修业</div>
+  <div class="honors">
+    <span class="honor">全国现代教育技术实验校</span>
+    <span class="honor">中央电教馆中小学人工智能教学基地</span>
+    <span class="honor">湖北省数字校园示范校</span>
+    <span class="honor">武汉市四星级智慧校园</span>
+  </div>
+  <div class="contact">
+    <span>招生代码：<b>033</b></span>
+    <span>咨询热线：<b>027-82886890</b></span>
+  </div>
+</div>
+<div class="chat-wrap" id="chat"></div>
+<div class="input-bar">
+  <textarea id="input" placeholder="请输入问题…" rows="1" onkeydown="onKey(event)" oninput="grow(this)"></textarea>
+  <button class="send" id="sendBtn" onclick="doSend()">发送</button>
+</div>
+<div class="bottom-bar">
+  <button class="float-btn" onclick="toggleKB()">📖 知识库</button>
+  <button class="float-btn" onclick="clearMemory()">🗑️ 遗忘</button>
+</div>
+<div class="kb-overlay" id="kbOverlay" onclick="toggleKB()"></div>
+<div class="kb-panel" id="kbPanel">
+  <button class="kb-close" onclick="toggleKB()">✕</button>
+  <div class="kb-title">📚 知识库状态</div>
+  <div class="kb-info" id="kbInfo">点击下方按钮刷新</div>
+  <div class="kb-list" id="kbList"></div>
+  <button class="float-btn" style="margin-top:12px;width:100%;text-align:center" onclick="refreshKB()">🔄 立即刷新</button>
+</div>
+
+<script>
+/* ═══ IMA API ═══ */
+var IMA = {
+  cid: '22865df66af95dde95a7b409f5d4c169',
+  key: 'dSP8B0Nk4L3Fago8/f628aBnvuQbzZqU2wtLeG+N7n4iMPwjbbnFacqBNJOPL22LzwZ1s0NQ1Q==',
+  kb: 't3nWn_8jjpTQTBBnhtt7ncitcgoeacLBo37X4LScBEw=',
+  search: function(q) {
+    return fetch('https://ima.qq.com/openapi/wiki/v1/search_knowledge', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json; charset=utf-8', 'ima-openapi-clientid': this.cid, 'ima-openapi-apikey': this.key},
+      body: JSON.stringify({query: q, knowledge_base_id: this.kb, cursor: ''})
+    }).then(function(r) { return r.json(); })
+    .then(function(j) { return (j.code === 0 && j.data && j.data.info_list) ? j.data.info_list : []; })
+    .catch(function() { return []; });
+  },
+  multiSearch: function(qs) {
+    var self = this, seen = {}, all = [];
+    var chain = Promise.resolve();
+    qs.forEach(function(q) {
+      chain = chain.then(function() {
+        return self.search(q).then(function(list) {
+          list.forEach(function(item) {
+            if (!seen[item.media_id]) { seen[item.media_id] = 1; all.push(item); }
+          });
+        });
+      }).then(function() { return new Promise(function(r) { setTimeout(r, 150); }); });
+    });
+    return chain.then(function() { return all; });
+  },
+  fullScan: function() {
+    var qs = ['二十中','招生','艺术','美术','音乐','体育','排球','高考','成绩','一本','智慧','教学','人工智能','机器人','编程','德育','班会','活动','社团','研学','校友','校史','进德','荣誉','示范','教师','师资','食堂','开放日','成人礼','誓师','歌手','篮球','向警予','红色','智雅','责信','翻转课堂','精准教学','大数据','AI','实验校','四星','五星','智慧校园','低进高出','菁英','写生','联考','运动会','百年','1909','陈昌智','谢芳','文志英','2026','2025','2024','2023','招生简章','招生公告','招生计划','二十中小智','480','人数'];
+    return this.multiSearch(qs);
+  }
+};
+
+/* ═══ 学习记忆 ═══ */
+var LEARN_KEY = 'xzx_learn_v3';
+function loadLearn() { try { return JSON.parse(localStorage.getItem(LEARN_KEY)) || []; } catch(e) { return []; } }
+function saveLearn(d) { localStorage.setItem(LEARN_KEY, JSON.stringify(d)); }
+function addLearn(kw, ans, q) {
+  var d = loadLearn(), i;
+  for (i = 0; i < d.length; i++) { if (d[i].kw === kw) break; }
+  if (i < d.length) { d[i].answer = ans; d[i].question = q; d[i].time = Date.now(); }
+  else { d.push({kw: kw, answer: ans, question: q, time: Date.now()}); }
+  saveLearn(d);
+}
+
+/* ═══ 内置知识库（用单引号避免引号冲突）═══ */
+var KB = {};
+
+KB['学校简介'] = '武汉市第二十中学创建于1909年，是江岸区唯一的百年中学，首批市级示范高中。校训\u300c进德修业\u300d，以\u300c低进高出\u300d闻名。2026年计划招生480人。荣获全国现代教育技术实验学校、中央电化教育馆人工智能教学基地、湖北省数字校园示范校、武汉市四星级智慧校园等荣誉。';
+
+KB['百年校史'] = '武汉市第二十中学创建于1909年，至今117年历史。是江岸区唯一一所百年中学。杰出校友：原全国人大常委会副委员长陈昌智、清华大学博导文志英、表演艺术家谢芳、原武汉市人大常委会主任赵零等。';
+
+KB['荣誉资质'] = '1.全国现代教育技术实验学校 2.中央电化教育馆人工智能教学基地 3.湖北省数字校园示范校 4.武汉市四星级智慧校园(申报五星级) 5.全国人工智能教育实验校 6.湖北省教育系统先进集体 7.湖北省文明校园 8.教学综合考评立功单位 9.有效德育五星学校';
+
+KB['招生信息'] = '2026年招生：计划招生480人，志愿填报第二批第一志愿，招生代码033，咨询电话027-82886890。艺术生：美术班60人(热线13476072937)、音乐班15人(热线15391562680)、艺术咨询QQ群313718434。体育：排球后备人才(男女)。';
+
+KB['美术班招生'] = '2026年美术班招60人。2025届联考一本率100%，多名全省前50，省名师领衔，菁英名校班定向央美国美。美术热线13476072937，招生代码033。';
+
+KB['音乐班招生'] = '2026年音乐班招15人。专业师资团队，一对一声乐器乐指导。音乐热线15391562680，招生代码033。';
+
+KB['体育特长生'] = '2026年排球后备人才招生(男女)。特色活动：智雅杯篮球赛、春季田径运动会。电话027-82886890，代码033。';
+
+KB['高考成绩'] = '三年翻番！2023年一本率24%(600+14人)，2024年48%(600+20人)，2025年53%(600+21人)。进出口比250%~350%。典型：陈全丽联考261分全省前50，杨嗣麒刚达普高线逆袭，成康龙中考450全区前列，罗虎635分考入民航飞行学院，胡春雪596分考入中南财经政法。';
+
+KB['低进高出'] = '进出口比250%~350%。中考450分到高考全区前列，刚达普高线成功逆袭。通过大数据精准教学、AI机器人助教、翻转课堂实现因材施教。';
+
+KB['智慧校园'] = '四星级智慧校园(申报五星级)，全国现代教育技术实验校，中央电教馆AI教学基地，湖北省数字校园示范校，全国AI教育实验校。设施：智慧教室全覆盖、AI机器人助教、大数据精准教学平台、AI实验室、创客空间(3D打印/编程)。';
+
+KB['人工智能'] = '全国AI教育实验校(已入围)，中央电教馆AI教学基地。实践：AI训练营(机器人编程)、大数据精准教学、机器人助教翻转课堂、AI赋能英语课堂(七校联合体)、创客空间、推进AI教育培育核心素养。';
+
+KB['智慧教学'] = '大数据精准教学平台(个性化方案)、AI机器人助教(翻转课堂)、智慧课堂全覆盖(互动/实时反馈)、七校联合体AI赋能教研。成果：进出口比250%~350%，三年一本率24%到53%。';
+
+KB['智雅德育'] = '有效德育五星学校，立功单位。品牌：一班一品责信主题班会、戏剧化责信班会(学生自编自导)、智雅青蓝工程师徒结对。红色教育：与中共中央旧址馆联合举办向警予纪念活动，学生自编历史剧致敬向警予。';
+
+KB['学生活动'] = '十余个社团(文学/动漫/舞蹈/创客等)，校园歌手大赛、智雅杯篮球赛、春季田径运动会。研学：红色研学、电力/警察博物馆、社区志愿服务。仪式：高三成人礼(十八而志 大任始承)、百日誓师。';
+
+KB['校友榜样'] = '陈昌智(全国人大常委会副委员长)、赵零(武汉市人大常委会主任)、文志英(清华博导/国家科技进步一等奖)、谢芳(表演艺术家)、苏俊英和韩幼贤(港台校友设奖学金)。';
+
+KB['师资力量'] = '省名师领衔美术团队，智雅青蓝工程师徒结对，青年教师学科素质考核，七校联合体教研。';
+
+KB['校园环境'] = '智慧教室全覆盖、AI实验室、创客空间、学生食堂(定期开放日)、数字化校园管理系统。';
+
+/* ═══ 关键词匹配 ═══ */
+function matchKB(q) {
+  var l = q.toLowerCase(), matched = {}, m, kws, es, i, j;
+  var map = [
+    [['美术','画画','素描','色彩','写生','艺考','美术展','美术班','联考'],['美术班招生']],
+    [['音乐','声乐','器乐','音乐班'],['音乐班招生']],
+    [['艺术','艺术生','菁英'],['美术班招生','音乐班招生']],
+    [['体育','排球','后备人才','特长生'],['体育特长生']],
+    [['高考','成绩','一本','录取','升学','600分','进出口'],['高考成绩','低进高出']],
+    [['低进高出','逆袭'],['低进高出']],
+    [['智慧校园','四星','五星','星级','数字校园','食堂'],['智慧校园','校园环境']],
+    [['教学','课堂','教研','翻转课堂','精准'],['智慧教学']],
+    [['人工智能','ai','机器人','编程','创客','实验校','3d'],['人工智能']],
+    [['德育','智雅','班会','责信','一班一品','班主任','红色'],['智雅德育']],
+    [['活动','社团','研学','歌手','运动','篮球','成人礼','誓师'],['学生活动']],
+    [['校友','杰出','榜样','陈昌智','谢芳','文志英'],['校友榜样']],
+    [['历史','百年','校史','1909','校训'],['百年校史','学校简介']],
+    [['招生','报名','简章','代码','志愿','热线','电话','咨询','人数','计划','480'],['招生信息']],
+    [['师资','老师','名师','青蓝'],['师资力量']],
+    [['荣誉','获奖','示范'],['荣誉资质']]
+  ];
+  for (i = 0; i < map.length; i++) {
+    kws = map[i][0]; es = map[i][1];
+    for (j = 0; j < kws.length; j++) {
+      if (l.indexOf(kws[j]) >= 0) {
+        for (var k = 0; k < es.length; k++) matched[es[k]] = 1;
+      }
+    }
+  }
+  var keys = Object.keys(matched);
+  if (keys.length === 0) {
+    matched['学校简介'] = 1;
+    var c = q.replace(/[^\u4e00-\u9fa5a-z0-9]/gi, '');
+    if (c.length >= 2) {
+      for (var key in KB) { if (KB[key].indexOf(c) >= 0) matched[key] = 1; }
+    }
+    keys = Object.keys(matched);
+  }
+  var result = [];
+  for (i = 0; i < keys.length; i++) {
+    if (KB[keys[i]]) result.push({key: keys[i], content: KB[keys[i]]});
+  }
+  return result;
+}
+
+function buildAnswer(matched) {
+  var seen = {}, text = '', lines, line, clean, i, j;
+  for (i = 0; i < matched.length; i++) {
+    lines = matched[i].content.split('\n');
+    for (j = 0; j < lines.length; j++) {
+      clean = lines[j].trim();
+      if (clean && !seen[clean]) { seen[clean] = 1; text += lines[j] + '\n'; }
+    }
+  }
+  return text.trim() || KB['学校简介'];
+}
+
+/* ═══ 对话历史 ═══ */
+var history = [];
+var HIST_KEY = 'xzx_hist_v3';
+function loadHist() { try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; } catch(e) { return []; } }
+function saveHist() { localStorage.setItem(HIST_KEY, JSON.stringify(history.slice(-30))); }
+history = loadHist();
+
+/* ═══ 纠正学习 ═══ */
+function detectCorrection(msg) {
+  var corrWords = ['不对','错了','不是','应该是','实际上是','正确的是','改成','更新一下','我告诉你','提醒你'];
+  var found = false, i;
+  for (i = 0; i < corrWords.length; i++) {
+    if (msg.indexOf(corrWords[i]) >= 0) { found = true; break; }
+  }
+  if (!found) return null;
+  var corrected = null, m;
+  m = msg.match(/(?:是|应该是|实际上是|正确的是|改成)\s*(.+)/);
+  if (m && m[1].trim().length >= 2) corrected = m[1].trim();
+  else {
+    corrected = msg;
+    for (i = 0; i < corrWords.length; i++) {
+      corrected = corrected.replace(corrWords[i], '');
+    }
+    corrected = corrected.replace(/^[，、：:\s]+/, '').trim();
+  }
+  if (!corrected || corrected.length < 2) return null;
+  var topic = '';
+  var topicWords = ['招生','高考','美术','音乐','体育','智慧校园','人工智能','德育','活动','校友','校史','师资','校园','教学','低进高出','一本率'];
+  var lastBot = history.length > 0 ? history[history.length - 1] : null;
+  if (lastBot && lastBot.role === 'bot' && lastBot.text) {
+    for (i = 0; i < topicWords.length; i++) {
+      if (lastBot.text.indexOf(topicWords[i]) >= 0) { topic = topicWords[i]; break; }
+    }
+    if (!topic) topic = lastBot.text.replace(/\n/g, '').substring(0, 8);
+  }
+  return {topic: topic, corrected: corrected};
+}
+
+/* ═══ IMA关键词提取 ═══ */
+function extractKW(q) {
+  var stop = '的了吗呢啊是有在和与或我你他她它这那什么怎么如何为什么哪些多少可以能请想要会去做给对被把从向关于一下一个一些';
+  var tokens = q.replace(/[^\u4e00-\u9fa5a-z0-9]/gi, ' ').split(/\s+/);
+  var valid = [], i;
+  for (i = 0; i < tokens.length; i++) {
+    if (tokens[i].length >= 2 && stop.indexOf(tokens[i]) < 0) valid.push(tokens[i]);
+  }
+  if (valid.length === 0) return [q.substring(0, 20)];
+  var results = [valid.join('')];
+  if (valid.length >= 2) results.push(valid[0] + valid[1]);
+  return results.slice(0, 2);
+}
+
+/* ═══ 主回答 ═══ */
+function answer(q) {
+  return new Promise(function(resolve) {
+    // 1. 检查学习记忆
+    var learned = loadLearn(), i;
+    var qClean = q.replace(/[^\u4e00-\u9fa5a-z0-9]/gi, '');
+    for (i = 0; i < learned.length; i++) {
+      if (qClean.indexOf(learned[i].kw) >= 0 || learned[i].kw.indexOf(qClean) >= 0) {
+        resolve({text: learned[i].answer, sources: [], learned: true});
+        return;
+      }
+    }
+    // 2. IMA搜索
+    var kws = extractKW(q);
+    IMA.multiSearch(kws).then(function(imaDocs) {
+      var sources = [];
+      for (i = 0; i < Math.min(5, imaDocs.length); i++) sources.push(imaDocs[i].title);
+      // 3. 内置知识
+      var matched = matchKB(q);
+      var localAns = buildAnswer(matched);
+      if (!localAns || localAns.length < 20) localAns = KB['学校简介'];
+      resolve({text: localAns, sources: sources, learned: false});
+    }).catch(function() {
+      var matched = matchKB(q);
+      var localAns = buildAnswer(matched);
+      if (!localAns || localAns.length < 20) localAns = KB['学校简介'];
+      resolve({text: localAns, sources: [], learned: false});
+    });
+  });
+}
+
+/* ═══ UI ═══ */
+var chatEl = document.getElementById('chat');
+var inputEl = document.getElementById('input');
+var sendBtn = document.getElementById('sendBtn');
+
+function addMsg(text, role, sources, learned) {
+  var div = document.createElement('div');
+  div.className = 'msg ' + role;
+  var time = new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'});
+  var src = '', learn = '';
+  if (sources && sources.length > 0) src = '<div class="src">📄 IMA参考：' + sources.join('；') + '</div>';
+  if (learned) learn = '<div class="learn">💡 已学习记忆</div>';
+  div.innerHTML = '<div class="av">' + (role === 'bot' ? '🎓' : '👤') + '</div><div class="bbl">' + text.replace(/\n/g, '<br>') + src + learn + '<span class="t">' + time + '</span></div>';
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function showTyping() {
+  var d = document.createElement('div');
+  d.id = 'typing';
+  d.className = 'msg bot';
+  d.innerHTML = '<div class="av">🎓</div><div class="bbl"><div class="typing"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div></div>';
+  chatEl.appendChild(d);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function hideTyping() {
+  var el = document.getElementById('typing');
+  if (el) el.parentNode.removeChild(el);
+}
+
+function doSend() {
+  var text = inputEl.value.trim();
+  if (!text) return;
+  addMsg(text, 'user');
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  sendBtn.disabled = true;
+
+  // 纠正检测
+  var corr = detectCorrection(text);
+  if (corr) {
+    addMsg('好的，我记住了：' + corr.corrected + '\n\n以后关于「' + corr.topic + '」的问题，我会参考这个信息回答。', 'bot', [], true);
+    addLearn(corr.topic, corr.corrected, text);
+    history.push({role: 'user', text: text}, {role: 'bot', text: '已学习：' + corr.corrected});
+    saveHist();
+    sendBtn.disabled = false;
+    inputEl.focus();
+    return;
+  }
+
+  showTyping();
+  answer(text).then(function(ans) {
+    hideTyping();
+    addMsg(ans.text, 'bot', ans.sources, ans.learned);
+    history.push({role: 'user', text: text}, {role: 'bot', text: ans.text});
+    saveHist();
+    sendBtn.disabled = false;
+    inputEl.focus();
+  });
+}
+
+function onKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+}
+
+function grow(el) {
+  el.style.height = 'auto';
+  var h = Math.min(el.scrollHeight, 100);
+  el.style.height = h + 'px';
+}
+
+/* ═══ 知识库面板 ═══ */
+var kbOpen = false;
+function toggleKB() {
+  kbOpen = !kbOpen;
+  document.getElementById('kbPanel').classList.toggle('open', kbOpen);
+  document.getElementById('kbOverlay').classList.toggle('show', kbOpen);
+}
+
+function refreshKB() {
+  var info = document.getElementById('kbInfo');
+  var list = document.getElementById('kbList');
+  info.innerHTML = '🔄 正在扫描IMA知识库…';
+  list.innerHTML = '';
+  IMA.fullScan().then(function(docs) {
+    info.innerHTML = '共检索到 <b>' + docs.length + '</b> 篇文档<br>更新时间：' + new Date().toLocaleTimeString('zh-CN');
+    for (var i = 0; i < docs.length; i++) {
+      var item = document.createElement('div');
+      item.className = 'kb-item';
+      item.innerHTML = '<span class="dot">●</span>' + docs[i].title;
+      list.appendChild(item);
+    }
+  }).catch(function(e) {
+    info.innerHTML = '❌ 扫描失败：' + (e.message || e);
+  });
+}
+
+function clearMemory() {
+  if (confirm('确定清除所有学习记忆吗？')) {
+    localStorage.removeItem(LEARN_KEY);
+    localStorage.removeItem(HIST_KEY);
+    history = [];
+    chatEl.innerHTML = '';
+    addMsg('学习记忆和对话历史已清除。', 'bot');
+  }
+}
+
+inputEl.focus();
+</script>
+</body>
+</html>
